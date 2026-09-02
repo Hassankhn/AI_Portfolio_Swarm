@@ -1,0 +1,85 @@
+// Commercial PostgreSQL Database Schema for Al-Mizan AI (Vercel + Supabase/Prisma)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model UserAccount {
+  id                    String              @id @default(uuid())
+  email                 String              @unique
+  name                  String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  // Strategy Preferences
+  strategyProfile       String              @default("Mudarabah Growth")
+  autoRebalance         Boolean             @default(true)
+  autoPurify            Boolean             @default(true)
+  maxAllocation         Int                 @default(20)
+
+  // Relations
+  brokerCredentials     BrokerCredentials?
+  portfolioSnapshots    PortfolioSnapshot[]
+  tradeOrders           TradeOrder[]
+  rlModelWeights        RlModelWeights?
+}
+
+model BrokerCredentials {
+  id                    String              @id @default(uuid())
+  userId                String              @unique
+  user                  UserAccount         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerName            String              @default("Alpaca Securities")
+  mode                  String              @default("Paper Trading Sandbox")
+  accountNumber         String?
+  apiKeyEncrypted       String              // AES-256 Encrypted Key
+  apiSecretEncrypted    String              // AES-256 Encrypted Secret
+  isVerified            Boolean             @default(false)
+  updatedAt             DateTime            @updatedAt
+}
+
+model PortfolioSnapshot {
+  id                    String              @id @default(uuid())
+  userId                String
+  user                  UserAccount         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp             DateTime            @default(now())
+  totalCapitalUSD       Float
+  dailyProfitUSD        Float
+  dailyProfitPercent    Float
+  halalYieldAPY         Float
+  purifiedCharityTotal  Float
+  zakatPayableUSD       Float
+}
+
+model TradeOrder {
+  id                    String              @id @default(uuid())
+  userId                String
+  user                  UserAccount         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp             DateTime            @default(now())
+  brokerOrderId         String?
+  symbol                String
+  side                  String              // "BUY" or "SELL"
+  orderType             String              // "MARKET" or "LIMIT"
+  qty                   Float?
+  notionalUSD           Float?
+  fillPrice             Float?
+  status                String              // "SUBMITTED", "FILLED", "VETOED"
+  aaoifiBadge           String              // "HALAL_VERIFIED", "VETO_BLOCKED"
+  executionMessage      String
+}
+
+model RlModelWeights {
+  id                    String              @id @default(uuid())
+  userId                String              @unique
+  user                  UserAccount         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  epochs                Int                 @default(0)
+  winRatePercent        Float               @default(0.0)
+  avgReward             Float               @default(0.0)
+  qTableJson            Json                // Full Q-Matrix Policy Table
+  replayMemoryJson      Json                // Experience Replay Buffer Array
+  updatedAt             DateTime            @updatedAt
+}

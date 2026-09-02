@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/vite"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/alpaca-api/(.*)",
+      "dest": "https://paper-api.alpaca.markets/$1"
+    },
+    {
+      "src": "/alpaca-live-api/(.*)",
+      "dest": "https://api.alpaca.markets/$1"
+    },
+    {
+      "src": "/alpaca-data/(.*)",
+      "dest": "https://data.alpaca.markets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
