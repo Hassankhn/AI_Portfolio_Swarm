@@ -1,27 +1,21 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/vite"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/alpaca-api/(.*)",
-      "dest": "https://paper-api.alpaca.markets/$1"
+      "source": "/alpaca-api/(.*)",
+      "destination": "https://paper-api.alpaca.markets/$1"
     },
     {
-      "src": "/alpaca-live-api/(.*)",
-      "dest": "https://api.alpaca.markets/$1"
+      "source": "/alpaca-live-api/(.*)",
+      "destination": "https://api.alpaca.markets/$1"
     },
     {
-      "src": "/alpaca-data/(.*)",
-      "dest": "https://data.alpaca.markets/$1"
+      "source": "/alpaca-data/(.*)",
+      "destination": "https://data.alpaca.markets/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
