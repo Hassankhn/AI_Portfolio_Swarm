@@ -1,27 +1,8 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Key, PlusCircle, ArrowUpRight, Scale, Zap, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Key, PlusCircle, ArrowUpRight, Scale, Calculator, ChevronDown } from 'lucide-react';
 
-export default function Header({ portfolio, onOpenBrokerModal, onOpenDepositModal, onExecuteLiveOrder }) {
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [tradeNotice, setTradeNotice] = useState(null);
-
-  const handleManualTrade = async () => {
-    setIsExecuting(true);
-    setTradeNotice(null);
-    try {
-      const res = await onExecuteLiveOrder();
-      if (res && res.id) {
-        setTradeNotice(`Order Sent! ID: ${res.id.substring(0, 8)}`);
-      } else {
-        setTradeNotice("Order Placed!");
-      }
-    } catch (err) {
-      setTradeNotice(`Error: ${err.message || 'Check API Keys'}`);
-    } finally {
-      setIsExecuting(false);
-      setTimeout(() => setTradeNotice(null), 5000);
-    }
-  };
+export default function Header({ portfolio, onOpenBrokerModal, onOpenDepositModal, onOpenZakatModal }) {
+  const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-30 w-full glass-panel border-b border-emerald-900/40 px-4 lg:px-8 py-3 transition-all">
@@ -78,19 +59,43 @@ export default function Header({ portfolio, onOpenBrokerModal, onOpenDepositModa
           </div>
         </div>
 
-        {/* Actions & Broker Connection Pill */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap">
+        {/* Actions & Navigation Tools */}
+        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap relative">
           
-          {/* Instant Live Trade Trigger Button */}
-          <button
-            onClick={handleManualTrade}
-            disabled={isExecuting}
-            className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold font-mono flex items-center gap-1.5 shadow-md transition-transform hover:scale-105"
-            title="Send an immediate live test order to Alpaca"
-          >
-            <Zap className="w-3.5 h-3.5 fill-slate-950" />
-            <span>{isExecuting ? 'Sending Order...' : '⚡ Buy 1 NVDA Spot Now'}</span>
-          </button>
+          {/* Islamic Finance Tools Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
+              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 flex items-center gap-1.5 shadow-sm transition-all"
+            >
+              <Calculator className="w-3.5 h-3.5 text-purple-400" />
+              <span>Islamic Tools</span>
+              <ChevronDown className="w-3 h-3 text-slate-400" />
+            </button>
+
+            {isToolsMenuOpen && (
+              <div 
+                className="absolute right-0 mt-2 w-64 glass-panel-glow rounded-xl border border-purple-500/30 p-2 shadow-2xl z-50 animate-fade-in"
+                onMouseLeave={() => setIsToolsMenuOpen(false)}
+              >
+                <button
+                  onClick={() => {
+                    setIsToolsMenuOpen(false);
+                    onOpenZakatModal();
+                  }}
+                  className="w-full text-left p-2.5 rounded-lg hover:bg-purple-950/50 flex items-center gap-2.5 transition-colors group"
+                >
+                  <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30">
+                    <Scale className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white group-hover:text-purple-300">Zakat & Purification Calculator</div>
+                    <div className="text-[10px] text-slate-400">Hawl & Nisab wealth assessment</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Broker Access Pill */}
           <button 
@@ -120,15 +125,6 @@ export default function Header({ portfolio, onOpenBrokerModal, onOpenDepositModa
         </div>
 
       </div>
-
-      {tradeNotice && (
-        <div className="max-w-7xl mx-auto mt-2 px-4">
-          <div className="p-2 rounded-lg bg-amber-950/90 border border-amber-500/50 text-amber-200 text-xs font-mono font-bold flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-amber-400" />
-            <span>{tradeNotice}</span>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

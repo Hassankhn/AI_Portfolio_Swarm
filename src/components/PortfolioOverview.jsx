@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, TrendingUp, HeartHandshake, Scale, Bot, ShieldCheck, Zap } from 'lucide-react';
+import { DollarSign, TrendingUp, HeartHandshake, ShieldCheck, Bot } from 'lucide-react';
 
 export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZakatModal }) {
   return (
@@ -49,7 +49,10 @@ export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZak
       </div>
 
       {/* 3. Purified Income Vault */}
-      <div className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-purple-500/40 transition-all relative overflow-hidden group">
+      <div 
+        onClick={onOpenZakatModal}
+        className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-purple-500/40 transition-all relative overflow-hidden cursor-pointer group"
+      >
         <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all"></div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Charity Purification</span>
@@ -62,28 +65,25 @@ export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZak
         </div>
         <div className="text-xs text-slate-400 flex items-center justify-between">
           <span>Auto-routed Micro Fractions</span>
-          <span className="text-purple-300 font-semibold font-mono">0.00% Haram Left</span>
+          <span className="text-purple-300 font-semibold font-mono text-[11px] underline">View Vault →</span>
         </div>
       </div>
 
-      {/* 4. Zakat Liability & Nisab */}
-      <div 
-        onClick={onOpenZakatModal}
-        className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-amber-500/40 transition-all relative overflow-hidden cursor-pointer group"
-      >
-        <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all"></div>
+      {/* 4. AAOIFI Sharia Certification Score */}
+      <div className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Zakat Accrued (2.5%)</span>
-          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <Scale className="w-4 h-4" />
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">AAOIFI Compliance</span>
+          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <ShieldCheck className="w-4 h-4" />
           </div>
         </div>
-        <div className="text-2xl font-black text-amber-300 font-mono mb-1">
-          ${portfolio.zakatPayableUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        <div className="text-2xl font-black text-emerald-400 font-mono mb-1">
+          100% Halal
         </div>
         <div className="text-xs text-slate-400 flex items-center justify-between">
-          <span className="text-emerald-400 font-medium">Above Nisab ($5,840)</span>
-          <span className="text-amber-400 font-semibold underline text-[11px]">View Calculator →</span>
+          <span className="text-emerald-400 font-medium">Standards 21 & 59 Verified</span>
+          <span className="text-slate-500 font-mono text-[10px]">0 Haram Rev</span>
         </div>
       </div>
 

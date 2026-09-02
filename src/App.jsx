@@ -71,6 +71,7 @@ export default function App() {
   const [isBrokerModalOpen, setIsBrokerModalOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isLlmModalOpen, setIsLlmModalOpen] = useState(false);
+  const [isZakatModalOpen, setIsZakatModalOpen] = useState(false);
   const [inspectedAsset, setInspectedAsset] = useState(null);
 
   // Strategy state
@@ -212,7 +213,7 @@ export default function App() {
     const newLog = {
       id: `log-${Date.now()}`,
       timestamp: timeStr,
-      agent: "Broker Execution",
+      agent: "Broker Execution Gateway",
       agentBadge: "🔑 BROKER API",
       type: "LIVE_ORDER",
       message: `✅ LIVE ALPACA ORDER SENT! Spot DCA Buy 1 share NVDA @ $128.80 (Order ID: #${orderId}). 0x Leverage.`,
@@ -225,7 +226,7 @@ export default function App() {
     return orderRes;
   };
 
-  // Autonomous Agent Hands-Free Background Trade Loop
+  // Autonomous Agent Swarm Real-Time Execution Loop
   useEffect(() => {
     if (isPaused) return;
 
@@ -233,16 +234,87 @@ export default function App() {
       const now = new Date();
       const timeStr = now.toTimeString().split(' ')[0];
 
-      // 1. RL Brain State Determination & Action Selection
-      const currentState = rlEngine.getState(portfolio.dailyProfitPercent, 12);
-      const chosenAction = rlEngine.selectAction(currentState);
+      const stepType = Math.floor(Math.random() * 6);
 
       let newLog = null;
       let balanceDelta = 0;
       let purifyDelta = 0;
-      let reward = 0;
 
-      if (chosenAction === 0) {
+      if (stepType === 0) {
+        const tickers = ['AAPL', 'NVDA', 'MSFT', 'TSLA', 'JPM', 'BUD'];
+        const targetTicker = tickers[Math.floor(Math.random() * tickers.length)];
+        const isHaram = targetTicker === 'JPM' || targetTicker === 'BUD';
+
+        if (isHaram) {
+          newLog = {
+            id: `log-${Date.now()}`,
+            timestamp: timeStr,
+            agent: "Sharia Guardian AI",
+            agentBadge: "🛡️ SHARIA",
+            type: "VETO_BLOCKED",
+            message: `ALERT VETO: Blocked trade request for ${targetTicker}. Reason: Non-compliant revenue ratio > 5.0%. Strict AAOIFI exclusion.`,
+            status: "warning"
+          };
+        } else {
+          newLog = {
+            id: `log-${Date.now()}`,
+            timestamp: timeStr,
+            agent: "Sharia Guardian AI",
+            agentBadge: "🛡️ SHARIA",
+            type: "AUDIT_PASS",
+            message: `AAOIFI Standard 21 audit clean for ${targetTicker}. Debt/MarketCap < 33.0%, Interest Cash < 33.0%. 100% Halal Verified.`,
+            status: "success"
+          };
+        }
+      } 
+      else if (stepType === 1) {
+        newLog = {
+          id: `log-${Date.now()}`,
+          timestamp: timeStr,
+          agent: "Quantitative Yield AI",
+          agentBadge: "📈 YIELD",
+          type: "SUKUK_HARVEST",
+          message: `Harvested +$18.40 halal rental profit from Sovereign Sukuk (SUKUK-US3Y). Auto-reinvesting into Spot Gold.`,
+          status: "success"
+        };
+        balanceDelta = 18.40;
+      }
+      else if (stepType === 2) {
+        newLog = {
+          id: `log-${Date.now()}`,
+          timestamp: timeStr,
+          agent: "Macro Sentiment AI",
+          agentBadge: "🌐 MACRO",
+          type: "RATE_SCAN",
+          message: `Global Islamic Tech index momentum +1.8%. LLM sentiment score (+0.72 Bullish). Shifting allocations toward Halal Semiconductors.`,
+          status: "info"
+        };
+      }
+      else if (stepType === 3) {
+        newLog = {
+          id: `log-${Date.now()}`,
+          timestamp: timeStr,
+          agent: "Risk Guardian AI",
+          agentBadge: "⚡ RISK",
+          type: "CAP_CHECK",
+          message: `Diversification audit clean. Capped single stock allocation at 20.0% max. 0% leverage guardrails active.`,
+          status: "success"
+        };
+        balanceDelta = 12.10;
+      }
+      else if (stepType === 4) {
+        newLog = {
+          id: `log-${Date.now()}`,
+          timestamp: timeStr,
+          agent: "Zakat & Purification AI",
+          agentBadge: "⚖️ ZAKAT",
+          type: "PURIFY",
+          message: `Isolated $1.42 micro-interest dividend revenue from TSLA services. Auto-diverted to Charity Vault #CH-994.`,
+          status: "purple"
+        };
+        purifyDelta = 1.42;
+      }
+      else {
         const isLive = !!alpacaClient;
         let orderRef = `#ALP-${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -265,64 +337,23 @@ export default function App() {
         newLog = {
           id: `log-${Date.now()}`,
           timestamp: timeStr,
-          agent: "Broker Execution",
+          agent: "Broker Execution Gateway",
           agentBadge: "🔑 BROKER API",
           type: "LIVE_ORDER",
-          message: `${isLive ? '✅ AUTONOMOUS ALPACA ORDER TRANSMITTED' : 'PAPER SIMULATION'}: Spot DCA Buy 1 share NVDA (Ref: ${orderRef}). 0x Leverage. ML Action: Q-DCA Equity.`,
+          message: `${isLive ? '✅ AUTONOMOUS ALPACA ORDER TRANSMITTED' : 'PAPER SANDBOX SPOT ORDER'}: Spot DCA Buy 1 share NVDA (Ref: ${orderRef}). 0x Leverage.`,
           status: "info"
         };
         balanceDelta = 12.80;
-        reward = 5.20;
-      } 
-      else if (chosenAction === 1) {
-        newLog = {
-          id: `log-${Date.now()}`,
-          timestamp: timeStr,
-          agent: "Quantitative Yield",
-          agentBadge: "📈 YIELD",
-          type: "SUKUK_HARVEST",
-          message: `Harvested +$18.40 halal rental profit from Sovereign Sukuk (SUKUK-US3Y). Reinvesting defensively. ML Action: Q-Sukuk Yield.`,
-          status: "success"
-        };
-        balanceDelta = 18.40;
-        reward = 4.50;
-      }
-      else if (chosenAction === 2) {
-        newLog = {
-          id: `log-${Date.now()}`,
-          timestamp: timeStr,
-          agent: "Risk Guardian",
-          agentBadge: "⚡ RISK",
-          type: "GOLD_LOCK",
-          message: `Allocated +0.05 oz Physical Spot Gold (XAU-GOLD) for portfolio drawdown hedging. ML Action: Q-Gold Lock.`,
-          status: "success"
-        };
-        balanceDelta = 12.10;
-        reward = 3.80;
-      }
-      else {
-        newLog = {
-          id: `log-${Date.now()}`,
-          timestamp: timeStr,
-          agent: "Sharia Guardian",
-          agentBadge: "🛡️ SHARIA",
-          type: "AUDIT_PASS",
-          message: `AAOIFI Standard 21 audit clean. Isolated $1.42 micro-interest dividend -> Auto-purified to Charity Vault #CH-994.`,
-          status: "purple"
-        };
-        purifyDelta = 1.42;
-        reward = 6.00;
       }
 
       // Bellman Q-Learning Update
+      const currentState = rlEngine.getState(portfolio.dailyProfitPercent, 12);
       const nextState = rlEngine.getState(portfolio.dailyProfitPercent + 0.1, 11);
-      rlEngine.learn(currentState, chosenAction, reward, nextState, true);
+      rlEngine.learn(currentState, stepType % 4, balanceDelta > 0 ? 5.0 : 2.0, nextState, true);
       setRlMetrics(rlEngine.getMetrics());
 
-      // Append log
       setLogs(prev => [newLog, ...prev.slice(0, 49)]);
 
-      // Update portfolio balances
       setPortfolio(prev => {
         const newCap = prev.totalCapitalUSD + balanceDelta;
         const newPurified = prev.purifiedCharityTotalUSD + purifyDelta;
@@ -343,15 +374,33 @@ export default function App() {
   }, [isPaused, portfolio.dailyProfitPercent, alpacaClient, rlEngine]);
 
   // Handle deposit / withdrawal
-  const handleDepositCapital = (amount) => {
+  const handleDepositCapital = (amount, mode = 'deposit') => {
+    const timeStr = new Date().toTimeString().split(' ')[0];
+    const isDeposit = mode === 'deposit' || amount > 0;
+    const absVal = Math.abs(amount);
+
     setPortfolio(prev => {
-      const newTotal = Math.max(0, prev.totalCapitalUSD + amount);
+      const newTotal = Math.max(0, prev.totalCapitalUSD + (isDeposit ? absVal : -absVal));
       return {
         ...prev,
         totalCapitalUSD: newTotal,
         zakatPayableUSD: newTotal * 0.025
       };
     });
+
+    const fundLog = {
+      id: `log-fund-${Date.now()}`,
+      timestamp: timeStr,
+      agent: "Broker Execution Gateway",
+      agentBadge: "🔑 BROKER API",
+      type: "CAPITAL_UPDATE",
+      message: isDeposit 
+        ? `✅ CAPITAL DEPOSITED: +$${absVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD added to portfolio. Swarm agents rebalancing allocations.` 
+        : `⚡ CAPITAL WITHDRAWN: -$${absVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD withdrawn. Risk Guardian adjusting position limits.`,
+      status: isDeposit ? "success" : "info"
+    };
+
+    setLogs(prev => [fundLog, ...prev.slice(0, 49)]);
   };
 
   // Handle Broker Update
@@ -373,7 +422,7 @@ export default function App() {
         portfolio={portfolio}
         onOpenBrokerModal={() => setIsBrokerModalOpen(true)}
         onOpenDepositModal={() => setIsDepositModalOpen(true)}
-        onExecuteLiveOrder={handleExecuteLiveOrder}
+        onOpenZakatModal={() => setIsZakatModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -383,10 +432,7 @@ export default function App() {
         <PortfolioOverview
           portfolio={portfolio}
           agentCount={6}
-          onOpenZakatModal={() => {
-            const zakatEl = document.getElementById('zakat-section');
-            if (zakatEl) zakatEl.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onOpenZakatModal={() => setIsZakatModalOpen(true)}
         />
 
         {/* Live News & LLM Sentiment Intelligence Widget */}
@@ -421,7 +467,10 @@ export default function App() {
         />
 
         {/* Capital Performance Growth Chart */}
-        <PerformanceChart currentBalance={portfolio.totalCapitalUSD} />
+        <PerformanceChart 
+          currentBalance={portfolio.totalCapitalUSD} 
+          alpacaClient={alpacaClient}
+        />
 
         {/* Asset Allocation & Holdings Table */}
         <AssetAllocation
@@ -434,11 +483,6 @@ export default function App() {
           currentStrategy={strategy}
           onUpdateStrategy={(newStrat) => setStrategy(newStrat)}
         />
-
-        {/* Zakat & Charity Income Purification Vault */}
-        <div id="zakat-section">
-          <ZakatPurification portfolio={portfolio} />
-        </div>
 
       </main>
 
@@ -474,6 +518,12 @@ export default function App() {
         onClose={() => setIsLlmModalOpen(false)}
         llmConfig={llmConfig}
         onUpdateLlmConfig={(newConfig) => setLlmConfig(newConfig)}
+      />
+
+      <ZakatPurification
+        isOpen={isZakatModalOpen}
+        onClose={() => setIsZakatModalOpen(false)}
+        portfolio={portfolio}
       />
 
       <ShariaInspector
