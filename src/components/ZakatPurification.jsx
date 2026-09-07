@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Scale, HeartHandshake, CheckCircle2, DollarSign, Calendar, Info, ShieldCheck } from 'lucide-react';
 
 export default function ZakatPurification({ portfolio, isOpen, onClose }) {
@@ -11,6 +11,17 @@ export default function ZakatPurification({ portfolio, isOpen, onClose }) {
   ]);
 
   const [zakatPaid, setZakatPaid] = useState(false);
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Custom user inputs for precise Zakat calculation (yearly income after one year / before Ramadan)
   const [annualSavings, setAnnualSavings] = useState((portfolio?.totalCapitalUSD || 50000).toString());
@@ -26,8 +37,14 @@ export default function ZakatPurification({ portfolio, isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto glass-panel-glow rounded-2xl border border-purple-500/40 p-5 sm:p-6 shadow-2xl scrollbar-thin">
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in overflow-y-auto"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto glass-panel-glow rounded-2xl border border-purple-500/40 p-5 sm:p-6 shadow-2xl scrollbar-thin"
+      >
         
         {/* Top Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">

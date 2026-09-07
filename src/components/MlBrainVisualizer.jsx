@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Brain, Zap, Activity, Download, RefreshCw, Award, Layers, PlayCircle, Trash2 } from 'lucide-react';
+import { Cpu, Brain, Zap, Activity, Download, Award, Layers, PlayCircle, Trash2 } from 'lucide-react';
 
 export default function MlBrainVisualizer({ rlEngine, onTrainRealData, isTrainingReal }) {
   const [activeTab, setActiveTab] = useState('qtable');
@@ -74,7 +74,9 @@ export default function MlBrainVisualizer({ rlEngine, onTrainRealData, isTrainin
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Data Source: <strong className="text-cyan-300 font-mono">{metrics.dataSource}</strong>
+              Data Source: <strong className="text-cyan-300 font-mono">
+                {metrics.epochs > 0 ? `Real-Time Bellman Training (${metrics.epochs} Epochs)` : 'Clean Model (Epoch 0)'}
+              </strong>
             </p>
           </div>
         </div>

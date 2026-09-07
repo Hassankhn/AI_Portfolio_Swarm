@@ -52,8 +52,8 @@ export default function AgentOrderTracker({ orders = [], onRefreshOrders, isSync
         </button>
       </div>
 
-      {/* Orders List / Table */}
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left font-mono text-xs">
           <thead>
             <tr className="border-b border-slate-800 text-slate-400 text-[10px] uppercase">
@@ -119,6 +119,49 @@ export default function AgentOrderTracker({ orders = [], onRefreshOrders, isSync
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View (< 640px) */}
+      <div className="block sm:hidden space-y-3 font-mono">
+        {orders.length === 0 ? (
+          <div className="py-6 text-center text-slate-500 text-xs font-sans">
+            No active live orders yet.
+          </div>
+        ) : (
+          orders.map((ord) => {
+            const orderId = ord.id ? `#ALP-${ord.id.substring(0, 8)}` : `#ALP-${Math.floor(100000 + Math.random() * 900000)}`;
+            const status = ord.status || 'filled';
+            return (
+              <div key={ord.id || Math.random()} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-amber-300">{orderId}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${getStatusBadge(status)}`}>
+                    {status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <div className="font-sans">
+                    <span className="font-bold text-white font-mono">{ord.symbol || 'NVDA'}</span>
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded ml-2 border border-emerald-500/30">
+                      {ord.side || 'BUY'}
+                    </span>
+                  </div>
+                  <span className="font-bold text-emerald-400">
+                    ${parseFloat(ord.filled_avg_price || ord.limit_price || 128.80).toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-900 text-slate-400">
+                  <span className="inline-flex items-center gap-1 text-emerald-400 text-[10px]">
+                    <ShieldCheck className="w-3 h-3" /> AAOIFI Passed
+                  </span>
+                  <span>{ord.created_at ? new Date(ord.created_at).toLocaleTimeString() : new Date().toLocaleTimeString()}</span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
     </div>

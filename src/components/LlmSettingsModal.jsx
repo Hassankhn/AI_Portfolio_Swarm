@@ -1,65 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Key, CheckCircle2, Bot, ShieldCheck } from 'lucide-react';
+import { X, Sparkles, Key, CheckCircle2, Bot, ShieldCheck, Lock } from 'lucide-react';
 
 export default function LlmSettingsModal({ isOpen, onClose, llmConfig, onUpdateLlmConfig }) {
   if (!isOpen) return null;
 
-  const [provider, setProvider] = useState(llmConfig?.provider || 'openai');
-  const [apiKey, setApiKey] = useState(llmConfig?.apiKey || '');
+  const [provider, setProvider] = useState(llmConfig.provider || 'openai');
+  const [apiKey, setApiKey] = useState(llmConfig.apiKey || '');
   const [isSaved, setIsSaved] = useState(false);
 
+  // Close modal on Escape key press
   useEffect(() => {
-    const saved = localStorage.getItem('AL_MIZAN_LLM_CONFIG');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.provider) setProvider(parsed.provider);
-        if (parsed.apiKey) setApiKey(parsed.apiKey);
-      } catch (e) {}
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
     }
-  }, [isOpen]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleSave = (e) => {
     e.preventDefault();
-    const newConfig = {
-      provider: provider,
+    onUpdateLlmConfig({
+      provider,
       apiKey: apiKey.trim(),
-      enabled: apiKey.trim().length > 5
-    };
+      enabled: !!apiKey.trim()
+    });
 
-    localStorage.setItem('AL_MIZAN_LLM_CONFIG', JSON.stringify(newConfig));
-    onUpdateLlmConfig(newConfig);
+    localStorage.setItem('AL_MIZAN_LLM_CONFIG', JSON.stringify({
+      provider,
+      apiKey: apiKey.trim(),
+      enabled: !!apiKey.trim()
+    }));
 
     setIsSaved(true);
     setTimeout(() => {
       setIsSaved(false);
       onClose();
-    }, 600);
+    }, 1200);
   };
 
-  const providers = [
-    { id: 'openai', label: 'OpenAI GPT-4o / GPT-4o-mini', icon: '🤖', desc: 'Industry-standard news & earnings report sentiment' },
-    { id: 'gemini', label: 'Google Gemini 1.5 Pro / Flash', icon: '✨', desc: 'Google Advanced Multimodal Intelligence' },
-    { id: 'deepseek', label: 'DeepSeek R1 / V3', icon: '🐋', desc: 'Cost-effective reasoning LLM' }
-  ];
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto glass-panel-glow rounded-2xl border border-cyan-500/40 p-5 sm:p-6 shadow-2xl scrollbar-thin">
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg glass-panel-glow rounded-2xl border border-purple-500/40 p-5 sm:p-6 shadow-2xl"
+      >
         
-        {/* Top Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-              <Sparkles className="w-6 h-6" />
+            <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                Optional LLM AI Engine Settings
-              </h2>
-              <p className="text-xs text-slate-400">
-                Connect OpenAI, Gemini, or DeepSeek for live financial news sentiment scoring
-              </p>
+              <h2 className="text-base font-bold text-white">LLM Intelligence Engine Setup</h2>
+              <p className="text-xs text-slate-400">Optional AI provider for live market sentiment scoring</p>
             </div>
           </div>
           <button 
@@ -70,74 +69,82 @@ export default function LlmSettingsModal({ isOpen, onClose, llmConfig, onUpdateL
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-4 font-mono text-xs">
           
           {/* Provider Selection */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Select LLM Model Provider
+            <label className="block text-slate-400 mb-2 uppercase tracking-wider text-[10px]">
+              Select AI Engine Provider
             </label>
-            <div className="space-y-2">
-              {providers.map((p) => (
-                <div
+            <div className="grid grid-cols-3 gap-2 font-sans">
+              {[
+                { id: 'openai', label: 'OpenAI GPT-4o' },
+                { id: 'gemini', label: 'Google Gemini' },
+                { id: 'deepseek', label: 'DeepSeek R1' }
+              ].map((p) => (
+                <button
                   key={p.id}
+                  type="button"
                   onClick={() => setProvider(p.id)}
-                  className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center gap-3 ${
-                    provider === p.id
-                      ? 'bg-cyan-950/60 border-cyan-400 text-white shadow-md'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700'
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
+                    provider === p.id 
+                      ? 'bg-purple-950/90 border-purple-500/50 text-purple-300 shadow-md' 
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="text-2xl">{p.icon}</span>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold flex items-center justify-between">
-                      <span>{p.label}</span>
-                      {provider === p.id && <CheckCircle2 className="w-4 h-4 text-cyan-400" />}
-                    </div>
-                    <div className="text-[11px] text-slate-400">{p.desc}</div>
-                  </div>
-                </div>
+                  {p.label}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* API Key input */}
+          {/* API Key Input */}
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">
+            <label className="block text-slate-400 mb-1">
               {provider.toUpperCase()} API Key (Optional)
             </label>
             <input
               type="password"
+              placeholder={provider === 'openai' ? 'sk-...' : 'API Key...'}
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder={`sk-... (Leave blank to use free local sentiment engine)`}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-purple-500"
             />
-            <p className="text-[11px] text-slate-500 mt-1">
-              If left blank, Al-Mizan AI uses its built-in free Local Algorithmic Sentiment Engine.
+            <p className="text-[10px] text-slate-500 mt-1 font-sans">
+              Leave blank to use the free built-in local sentiment engine.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex items-start gap-2.5">
-            <ShieldCheck className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-slate-300 leading-relaxed">
-              API Keys are stored 100% locally in your browser (`localStorage`). Keys are NEVER uploaded to any third-party server.
-            </div>
+          {/* Security Note */}
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 font-sans flex items-start gap-2">
+            <Lock className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+            <span>
+              API Keys are stored client-side in your local browser storage (`AL_MIZAN_LLM_CONFIG`). They are used exclusively for sentiment scoring on live financial headlines.
+            </span>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+          {/* Toast */}
+          {isSaved && (
+            <div className="p-3 rounded-xl bg-purple-950 text-purple-300 border border-purple-500/50 text-xs font-mono font-bold text-center">
+              ✅ LLM Intelligence Engine Updated!
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-900 text-slate-400 text-xs font-semibold"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-700"
             >
               Cancel
             </button>
+
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs font-bold font-mono shadow-md"
+              className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-slate-950 font-bold text-xs font-mono shadow-md"
             >
-              {isSaved ? 'Saved Config!' : 'Save LLM Settings'}
+              Save Configuration
             </button>
           </div>
 

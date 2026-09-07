@@ -1,7 +1,7 @@
 import React from 'react';
-import { DollarSign, TrendingUp, HeartHandshake, ShieldCheck, Bot } from 'lucide-react';
+import { DollarSign, TrendingUp, HeartHandshake, ShieldCheck, Bot, Info } from 'lucide-react';
 
-export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZakatModal }) {
+export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZakatModal, onOpenShariaInspector }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       
@@ -9,7 +9,10 @@ export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZak
       <div className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Net Halal Capital</span>
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            Net Halal Capital
+            <Info className="w-3 h-3 text-slate-500" title="Active capital deployed across AAOIFI-screened assets" />
+          </span>
           <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <DollarSign className="w-4 h-4" />
           </div>
@@ -52,6 +55,7 @@ export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZak
       <div 
         onClick={onOpenZakatModal}
         className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-purple-500/40 transition-all relative overflow-hidden cursor-pointer group"
+        title="Click to view Zakat & Purification Calculator"
       >
         <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all"></div>
         <div className="flex items-center justify-between mb-2">
@@ -65,12 +69,16 @@ export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZak
         </div>
         <div className="text-xs text-slate-400 flex items-center justify-between">
           <span>Auto-routed Micro Fractions</span>
-          <span className="text-purple-300 font-semibold font-mono text-[11px] underline">View Vault →</span>
+          <span className="text-purple-300 font-semibold font-mono text-[11px] underline group-hover:text-purple-200">View Vault →</span>
         </div>
       </div>
 
       {/* 4. AAOIFI Sharia Certification Score */}
-      <div className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-all relative overflow-hidden group">
+      <div 
+        onClick={onOpenShariaInspector}
+        className="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/50 transition-all relative overflow-hidden cursor-pointer group"
+        title="Click to inspect AAOIFI screening rules"
+      >
         <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">AAOIFI Compliance</span>
@@ -78,12 +86,13 @@ export default function PortfolioOverview({ portfolio, agentCount = 6, onOpenZak
             <ShieldCheck className="w-4 h-4" />
           </div>
         </div>
-        <div className="text-2xl font-black text-emerald-400 font-mono mb-1">
-          100% Halal
+        <div className="text-2xl font-black text-emerald-400 font-mono mb-1 flex items-center justify-between">
+          <span>100% Halal</span>
+          <span className="text-xs font-sans text-emerald-300 underline font-normal group-hover:text-emerald-200">Audit →</span>
         </div>
         <div className="text-xs text-slate-400 flex items-center justify-between">
           <span className="text-emerald-400 font-medium">Standards 21 & 59 Verified</span>
-          <span className="text-slate-500 font-mono text-[10px]">0 Haram Rev</span>
+          <span className="text-slate-500 font-mono text-[10px]">0 Riba</span>
         </div>
       </div>
 

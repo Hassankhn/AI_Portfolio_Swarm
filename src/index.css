@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -15,7 +13,7 @@
   body {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-primary);
+    background-color: #020617;
     color: #f8fafc;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     overflow-x: hidden;
@@ -25,7 +23,7 @@
 
 /* Glassmorphism & Card Styles */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -91,7 +89,7 @@
   background: rgba(16, 185, 129, 0.6);
 }
 
-/* Shimmer Button */
+/* Shimmer Buttons */
 .gold-shimmer-btn {
   background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
   transition: all 0.3s ease;

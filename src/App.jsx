@@ -433,6 +433,7 @@ export default function App() {
           portfolio={portfolio}
           agentCount={6}
           onOpenZakatModal={() => setIsZakatModalOpen(true)}
+          onOpenShariaInspector={() => setInspectedAsset(assets[0])}
         />
 
         {/* Live News & LLM Sentiment Intelligence Widget */}
@@ -482,6 +483,7 @@ export default function App() {
         <StrategyControls
           currentStrategy={strategy}
           onUpdateStrategy={(newStrat) => setStrategy(newStrat)}
+          portfolioBalance={portfolio.totalCapitalUSD}
         />
 
       </main>
