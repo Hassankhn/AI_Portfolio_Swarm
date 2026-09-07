@@ -97,6 +97,12 @@ export default function MlBrainVisualizer({ rlEngine, onTrainRealData, isTrainin
     window.location.reload();
   };
 
+  const dynamicDataSource = metrics.epochs > 0 
+    ? (metrics.dataSource && !metrics.dataSource.includes('Epoch 0') 
+        ? metrics.dataSource 
+        : `Pre-Trained AAOIFI Bellman Base Model (${metrics.epochs} Epochs)`)
+    : 'Clean Model (Epoch 0)';
+
   return (
     <div className="glass-panel-glow p-5 rounded-2xl border border-cyan-500/40 mb-6 relative overflow-hidden">
       
@@ -129,7 +135,7 @@ export default function MlBrainVisualizer({ rlEngine, onTrainRealData, isTrainin
             </div>
             <p className="text-xs text-slate-400">
               Data Source: <strong className="text-cyan-300 font-mono">
-                {metrics.dataSource || `Real-Time Bellman Training (${metrics.epochs} Epochs)`}
+                {dynamicDataSource}
               </strong>
             </p>
           </div>

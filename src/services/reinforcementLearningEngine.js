@@ -32,7 +32,13 @@ export class ReinforcementLearningEngine {
         this.totalTrades = parsed.totalTrades !== undefined ? parsed.totalTrades : PRETRAINED_BASE.totalTrades;
         this.avgReward = parsed.avgReward !== undefined ? parsed.avgReward : PRETRAINED_BASE.avgReward;
         this.epsilon = parsed.epsilon !== undefined ? parsed.epsilon : PRETRAINED_BASE.epsilon;
-        this.dataSource = parsed.dataSource || PRETRAINED_BASE.dataSource;
+
+        // Clean stale "Clean Model (Epoch 0)" strings if epochs > 0
+        if (parsed.dataSource && !parsed.dataSource.includes('Epoch 0')) {
+          this.dataSource = parsed.dataSource;
+        } else {
+          this.dataSource = PRETRAINED_BASE.dataSource;
+        }
       } catch (e) {
         this.loadPretrainedModel();
       }
