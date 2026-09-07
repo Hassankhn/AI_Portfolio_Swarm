@@ -1,4 +1,8 @@
-// Live News & LLM Market Sentiment Analysis Service (OpenAI / Gemini / DeepSeek Integration)
+// Live News & LLM Market Sentiment Analysis Service (OpenAI / Gemini / DeepSeek Integration with 5-Min Cache)
+
+let newsCache = null;
+let newsCacheTimestamp = 0;
+const CACHE_TTL_MS = 300000; // 5 Minutes in-memory cache
 
 export class NewsSentimentService {
   constructor(llmProvider = 'openai', apiKey = '') {
@@ -6,8 +10,13 @@ export class NewsSentimentService {
     this.apiKey = apiKey.trim();
   }
 
-  // Fetch real market news headlines from Alpaca News API
-  async fetchLiveMarketNews(symbol = 'NVDA') {
+  // Fetch real market news headlines from Alpaca News API (Cached for 5 minutes)
+  async fetchLiveMarketNews(symbol = 'NVDA', forceRefresh = false) {
+    const now = Date.now();
+    if (!forceRefresh && newsCache && (now - newsCacheTimestamp < CACHE_TTL_MS)) {
+      return newsCache;
+    }
+
     try {
       const savedConfig = localStorage.getItem('AL_MIZAN_BROKER_CONFIG');
       let headers = {};
@@ -24,21 +33,24 @@ export class NewsSentimentService {
       const res = await fetch(`/alpaca-data/v1/news?symbols=${symbol}&limit=5`, { headers });
       if (!res.ok) throw new Error("News API unavailable");
       const data = await res.json();
-      return data.news || [];
+      newsCache = data.news || [];
+      newsCacheTimestamp = now;
+      return newsCache;
     } catch (err) {
       // Fallback realistic news stream
-      return [
-        { headline: `${symbol} surges as demand for Halal AI chips accelerates globally.`, summary: "Strong quarterly growth momentum detected.", source: "Financial Times", created_at: new Date().toISOString() },
-        { headline: "Global Islamic Treasury Sukuk rental distribution yields reach multi-year highs.", summary: "Fixed income Mudarabah yields attractive.", source: "Bloomberg Islamic", created_at: new Date().toISOString() },
-        { headline: "US Federal Reserve signals potential rate cut cycle.", summary: "Tech equities momentum favorable.", source: "Reuters", created_at: new Date().toISOString() }
+      newsCache = [
+        { id: 'n1', headline: `${symbol} surges as demand for Halal AI chips accelerates globally.`, summary: "Strong quarterly growth momentum detected.", source: "Financial Times", created_at: new Date().toISOString() },
+        { id: 'n2', headline: "Global Islamic Treasury Sukuk rental distribution yields reach multi-year highs.", summary: "Fixed income Mudarabah yields attractive.", source: "Bloomberg Islamic", created_at: new Date().toISOString() },
+        { id: 'n3', headline: "US Federal Reserve signals potential rate cut cycle.", summary: "Tech equities momentum favorable.", source: "Reuters", created_at: new Date().toISOString() }
       ];
+      newsCacheTimestamp = now;
+      return newsCache;
     }
   }
 
   // Analyze Sentiment using LLM (OpenAI / Gemini / DeepSeek) or Local Sentiment Lexicon
   async analyzeNewsSentiment(newsItems) {
     if (this.apiKey && this.apiKey.length > 10) {
-      // Real LLM API Call
       if (this.llmProvider === 'openai') {
         return await this.analyzeWithOpenAI(newsItems);
       } else if (this.llmProvider === 'gemini') {
@@ -48,7 +60,6 @@ export class NewsSentimentService {
       }
     }
 
-    // High-performance Local Algorithmic Sentiment Lexicon (Free Fallback)
     return this.analyzeWithLocalLexicon(newsItems);
   }
 

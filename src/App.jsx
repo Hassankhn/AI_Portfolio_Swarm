@@ -158,7 +158,10 @@ export default function App() {
     if (!alpacaClient) return;
 
     let isMounted = true;
+    let isSyncingAccount = false;
     async function syncAlpacaAccount() {
+      if (isSyncingAccount) return;
+      isSyncingAccount = true;
       try {
         const acc = await alpacaClient.getAccount();
         if (acc && acc.portfolio_value && isMounted) {
@@ -178,6 +181,8 @@ export default function App() {
         }
       } catch (err) {
         console.warn("Could not sync Alpaca account balance:", err);
+      } finally {
+        isSyncingAccount = false;
       }
     }
 
@@ -187,7 +192,7 @@ export default function App() {
     const syncInterval = setInterval(() => {
       syncAlpacaAccount();
       syncAlpacaOrders();
-    }, 10000);
+    }, 20000);
 
     return () => {
       isMounted = false;
@@ -368,7 +373,7 @@ export default function App() {
         };
       });
 
-    }, 3800);
+    }, 12000);
 
     return () => clearInterval(interval);
   }, [isPaused, portfolio.dailyProfitPercent, alpacaClient, rlEngine]);
